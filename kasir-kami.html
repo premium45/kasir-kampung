@@ -1,0 +1,2603 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="theme-color" content="#059669">
+    <meta name="description" content="Warung Kita - Aplikasi Manajemen Warung">
+    <title>Warung Kita</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #059669;
+            --primary-dark: #047857;
+            --primary-light: #10B981;
+            --secondary: #FFFFFF;
+            --background: #F3F4F6;
+            --surface: #FFFFFF;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --text-muted: #9CA3AF;
+            --danger: #EF4444;
+            --danger-dark: #DC2626;
+            --warning: #F59E0B;
+            --success: #10B981;
+            --border: #E5E7EB;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Poppins', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background-color: var(--background);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            -webkit-tap-highlight-color: transparent;
+            padding-bottom: 80px;
+        }
+
+        /* Header Styles */
+        .header {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 16px;
+            z-index: 1000;
+            box-shadow: var(--shadow);
+        }
+
+        .header-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--secondary);
+            letter-spacing: 0.5px;
+        }
+
+        .header-action {
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .header-action:hover {
+            background: rgba(255, 255, 255, 0.25);
+            transform: scale(1.05);
+        }
+
+        .header-action svg {
+            width: 22px;
+            height: 22px;
+            fill: var(--secondary);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-top: 60px;
+            padding: 16px;
+            min-height: calc(100vh - 140px);
+        }
+
+        @keyframes pageSlideIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        @keyframes navItemBounce {
+            0% {
+                transform: scale(0.9);
+            }
+            50% {
+                transform: scale(1.1);
+            }
+            100% {
+                transform: scale(1);
+            }
+        }
+
+        .page {
+            display: none;
+            opacity: 0;
+            transform: translateX(20px);
+            transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+        }
+
+        .page.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+            animation: pageSlideIn 0.3s ease-out;
+        }
+
+        /* Bottom Navigation */
+        .bottom-nav {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 70px;
+            background: var(--surface);
+            display: flex;
+            justify-content: space-around;
+            align-items: flex-start;
+            padding-top: 8px;
+            box-shadow: 0 -4px 15px rgba(0, 0, 0, 0.08);
+            z-index: 1000;
+            border-top: 1px solid var(--border);
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            flex: 1;
+            height: 100%;
+            cursor: pointer;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            transform-origin: center center;
+        }
+
+        .nav-item svg {
+            width: 24px;
+            height: 24px;
+            fill: none;
+            stroke: var(--text-muted);
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item span {
+            font-size: 10px;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-top: 4px;
+            transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .nav-item.active {
+            animation: navItemBounce 0.3s ease-out;
+        }
+
+        .nav-item.active svg {
+            stroke: var(--primary);
+            transform: scale(1.1);
+        }
+
+        .nav-item.active span {
+            color: var(--primary);
+            font-weight: 600;
+            transform: scale(1.05);
+        }
+
+        .nav-item.active::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            width: 40px;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 0 0 4px 4px;
+            animation: indicatorSlideIn 0.3s ease-out;
+        }
+
+        @keyframes indicatorSlideIn {
+            from {
+                transform: scaleX(0);
+                opacity: 0;
+            }
+            to {
+                transform: scaleX(1);
+                opacity: 1;
+            }
+        }
+
+        /* Card Styles */
+        .card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 13px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 6px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px;
+            font-size: 15px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+            color: var(--text-primary);
+            transition: var(--transition);
+            font-family: inherit;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(5, 150, 105, 0.1);
+        }
+
+        .form-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        /* Camera Input */
+        .camera-container {
+            position: relative;
+            width: 100%;
+            height: 200px;
+            background: linear-gradient(135deg, #E5E7EB 0%, #D1D5DB 100%);
+            border-radius: var(--radius);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 16px;
+        }
+
+        .camera-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .camera-preview {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: none;
+        }
+
+        .camera-placeholder {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .camera-placeholder:hover {
+            opacity: 0.8;
+        }
+
+        .camera-placeholder svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--text-muted);
+        }
+
+        .camera-placeholder span {
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .camera-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 16px;
+            background: linear-gradient(transparent, rgba(0, 0, 0, 0.5));
+            display: none;
+            justify-content: center;
+            gap: 16px;
+        }
+
+        .camera-controls.active {
+            display: flex;
+        }
+
+        .camera-btn {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            border: 4px solid var(--secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .camera-btn-capture {
+            background: var(--danger);
+        }
+
+        .camera-btn-capture:active {
+            transform: scale(0.9);
+        }
+
+        .camera-btn-switch {
+            background: rgba(255, 255, 255, 0.3);
+            width: 44px;
+            height: 44px;
+            margin-top: 6px;
+        }
+
+        .camera-btn-switch svg {
+            width: 24px;
+            height: 24px;
+            stroke: var(--secondary);
+        }
+
+        .capture-btn-inner {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--secondary);
+        }
+
+        .camera-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 12px;
+        }
+
+        .camera-action-btn {
+            flex: 1;
+            padding: 12px;
+            font-size: 13px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .btn-gallery {
+            background: var(--background);
+            color: var(--text-primary);
+        }
+
+        .btn-camera {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .btn-gallery:hover, .btn-camera:hover {
+            opacity: 0.9;
+        }
+
+        /* Button Styles */
+        .btn {
+            width: 100%;
+            padding: 16px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-family: inherit;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: var(--secondary);
+            box-shadow: 0 4px 14px rgba(5, 150, 105, 0.4);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(5, 150, 105, 0.5);
+        }
+
+        .btn-primary:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: var(--secondary);
+        }
+
+        .btn-danger:hover {
+            background: var(--danger-dark);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: var(--secondary);
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 2px solid var(--border);
+            color: var(--text-primary);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Weight Input */
+        .weight-row {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .weight-input {
+            flex: 1;
+        }
+
+        .weight-unit {
+            padding: 14px 20px;
+            background: var(--background);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .weight-unit.active {
+            background: var(--primary);
+            color: var(--secondary);
+            border-color: var(--primary);
+        }
+
+        /* Product Grid */
+        .product-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .product-card {
+            background: var(--surface);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            overflow: hidden;
+            transition: var(--transition);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-card:hover {
+            transform: translateY(-4px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .product-image {
+            width: 100%;
+            height: 140px;
+            object-fit: cover;
+            background: var(--background);
+        }
+
+        .product-info {
+            padding: 12px;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .product-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .product-price {
+            font-size: 15px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 4px;
+        }
+
+        .product-weight {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-bottom: 8px;
+        }
+
+        .product-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: auto;
+        }
+
+        .product-btn {
+            flex: 1;
+            padding: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        .product-btn-cart {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .product-btn-cart:hover {
+            background: var(--primary-dark);
+        }
+
+        .product-btn-delete {
+            background: var(--danger);
+            color: var(--secondary);
+        }
+
+        .product-btn-delete:hover {
+            background: var(--danger-dark);
+        }
+
+        .product-btn svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Cart Item */
+        .cart-item {
+            display: flex;
+            align-items: center;
+            padding: 12px;
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .cart-item-image {
+            width: 60px;
+            height: 60px;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+            margin-right: 12px;
+        }
+
+        .cart-item-details {
+            flex: 1;
+        }
+
+        .cart-item-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .cart-item-price {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .cart-item-weight {
+            font-size: 12px;
+            color: var(--primary);
+            font-weight: 500;
+        }
+
+        .cart-item-qty {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--primary);
+        }
+
+        .cart-item-actions {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .qty-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: var(--background);
+            color: var(--text-primary);
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .qty-btn:hover {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .remove-item-btn {
+            width: 28px;
+            height: 28px;
+            border: none;
+            border-radius: 50%;
+            background: var(--danger);
+            color: var(--secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .remove-item-btn:hover {
+            background: var(--danger-dark);
+        }
+
+        .remove-item-btn svg {
+            width: 14px;
+            height: 14px;
+            stroke: var(--secondary);
+        }
+
+        /* Summary Section */
+        .summary-section {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: var(--radius);
+            padding: 20px;
+            color: var(--secondary);
+            margin-top: 16px;
+        }
+
+        .summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .summary-row:last-child {
+            margin-bottom: 0;
+            padding-top: 12px;
+            border-top: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .summary-label {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .summary-value {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .summary-total {
+            font-size: 24px;
+            font-weight: 700;
+        }
+
+        .payment-section {
+            margin-top: 16px;
+        }
+
+        .payment-input {
+            width: 100%;
+            padding: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            text-align: right;
+        }
+
+        .payment-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .change-display {
+            padding: 12px 16px;
+            border-radius: var(--radius-sm);
+            margin-top: 8px;
+            font-weight: 600;
+            text-align: right;
+            transition: var(--transition);
+        }
+
+        .change-positive {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success);
+        }
+
+        .change-negative {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--danger);
+        }
+
+        /* Debt Section */
+        .debt-form {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 16px;
+            box-shadow: var(--shadow);
+        }
+
+        .debt-list {
+            margin-top: 16px;
+        }
+
+        .debt-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px;
+            background: var(--surface);
+            border-radius: var(--radius-sm);
+            margin-bottom: 8px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .debt-info {
+            flex: 1;
+        }
+
+        .debt-name {
+            font-size: 15px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .debt-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            margin-top: 4px;
+        }
+
+        .debt-date {
+            font-size: 11px;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .debt-amount {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--danger);
+            margin-left: 12px;
+        }
+
+        .debt-actions {
+            display: flex;
+            gap: 8px;
+            margin-left: 12px;
+        }
+
+        .debt-action-btn {
+            width: 36px;
+            height: 36px;
+            border: none;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .debt-share-btn {
+            background: var(--primary);
+            color: var(--secondary);
+        }
+
+        .debt-share-btn:hover {
+            background: var(--primary-dark);
+        }
+
+        .debt-delete-btn {
+            background: var(--danger);
+            color: var(--secondary);
+        }
+
+        .debt-delete-btn:hover {
+            background: var(--danger-dark);
+        }
+
+        .debt-action-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .debt-total {
+            background: linear-gradient(135deg, var(--warning) 0%, #D97706 100%);
+            color: var(--secondary);
+            padding: 16px;
+            border-radius: var(--radius);
+            margin-bottom: 16px;
+            font-weight: 700;
+            font-size: 16px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* Transaction Section */
+        .transaction-item {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 16px;
+            margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+        }
+
+        .transaction-item:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-lg);
+        }
+
+        .transaction-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .transaction-date {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .transaction-total {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .transaction-items {
+            border-top: 1px solid var(--border);
+            padding-top: 12px;
+        }
+
+        .transaction-product {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+            padding: 4px 0;
+        }
+
+        /* Empty State */
+        .empty-state {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            text-align: center;
+        }
+
+        .empty-state svg {
+            width: 80px;
+            height: 80px;
+            stroke: var(--text-muted);
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        /* Toast Notification */
+        .toast {
+            position: fixed;
+            bottom: 90px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--text-primary);
+            color: var(--secondary);
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 2000;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+            padding: 20px;
+        }
+
+        .modal-overlay.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            background: var(--surface);
+            border-radius: var(--radius);
+            padding: 24px;
+            max-width: 320px;
+            width: 100%;
+            transform: scale(0.9);
+            transition: var(--transition);
+        }
+
+        .modal-overlay.show .modal {
+            transform: scale(1);
+        }
+
+        .modal-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 12px;
+        }
+
+        .modal-content {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 20px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+        }
+
+        .modal-actions .btn {
+            flex: 1;
+        }
+
+        /* Search Bar */
+        .search-container {
+            position: relative;
+            margin-bottom: 16px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 14px 16px 14px 44px;
+            font-size: 14px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            background: var(--surface);
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            stroke: var(--text-muted);
+        }
+
+        /* Section Title */
+        .section-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+        }
+
+        /* Badge */
+        .badge {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            width: 20px;
+            height: 20px;
+            background: var(--danger);
+            color: var(--secondary);
+            border-radius: 50%;
+            font-size: 11px;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .nav-item {
+            position: relative;
+        }
+
+        /* Price Input Format */
+        .price-wrapper {
+            position: relative;
+        }
+
+        .price-prefix {
+            position: absolute;
+            left: 16px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 15px;
+            color: var(--text-secondary);
+        }
+
+        .price-wrapper .form-input {
+            padding-left: 32px;
+        }
+
+        /* Weight Modal Specific Styles */
+        .weight-modal-product {
+            background: var(--background);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            margin-bottom: 16px;
+        }
+
+        .weight-modal-name {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .weight-modal-info {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .weight-modal-price {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .weight-input-section {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            margin-top: 16px;
+        }
+
+        .weight-input-section .form-input {
+            flex: 1;
+        }
+
+        .weight-input-section .weight-unit {
+            padding: 14px 16px;
+        }
+
+        .weight-preview {
+            background: rgba(5, 150, 105, 0.1);
+            border-radius: var(--radius-sm);
+            padding: 12px 16px;
+            margin-top: 16px;
+            text-align: center;
+        }
+
+        .weight-preview-text {
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .weight-preview-price {
+            font-size: 20px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 4px;
+        }
+
+        /* Responsive */
+        @media (min-width: 768px) {
+            .main-content {
+                max-width: 480px;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .product-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        /* Hide file input */
+        input[type="file"] {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <header class="header">
+        <h1 class="header-title">WARUNG KITA</h1>
+        <div class="header-action" onclick="showShareOptions()">
+            <svg viewBox="0 0 24 24">
+                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8" fill="none" stroke="currentColor" stroke-width="2"/>
+                <polyline points="16,6 12,2 8,6" fill="none" stroke="currentColor" stroke-width="2"/>
+                <line x1="12" y1="2" x2="12" y2="15" stroke="currentColor" stroke-width="2"/>
+            </svg>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Halaman 1: Input Produk -->
+        <div class="page active" id="page-input">
+            <div class="card">
+                <h2 class="section-title">Tambah Produk Baru</h2>
+                
+                <!-- Camera Input -->
+                <div class="camera-container" id="camera-container">
+                    <video class="camera-video" id="camera-video" autoplay playsinline></video>
+                    <img class="camera-preview" id="camera-preview" alt="Preview">
+                    <div class="camera-placeholder" id="camera-placeholder" onclick="startCamera()">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        <span>Tap untuk Buka Kamera</span>
+                    </div>
+                    <div class="camera-controls" id="camera-controls">
+                        <button class="camera-btn camera-btn-switch" onclick="switchCamera()" id="switch-camera-btn" style="display: none;">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                                <circle cx="12" cy="13" r="4"/>
+                                <path d="M15 2v4"/>
+                                <path d="M9 2v4"/>
+                            </svg>
+                        </button>
+                        <button class="camera-btn camera-btn-capture" onclick="capturePhoto()">
+                            <div class="capture-btn-inner"></div>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="camera-actions" id="camera-actions" style="display: none;">
+                    <button class="camera-action-btn btn-gallery" onclick="openGallery()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <rect x="3" y="3" width="18" height="18" rx="2" ry="2"/>
+                            <circle cx="8.5" cy="8.5" r="1.5"/>
+                            <polyline points="21,15 16,10 5,21"/>
+                        </svg>
+                        Galeri
+                    </button>
+                    <button class="camera-action-btn btn-camera" onclick="startCamera()">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/>
+                            <circle cx="12" cy="13" r="4"/>
+                        </svg>
+                        Kamera
+                    </button>
+                    <input type="file" id="gallery-input" accept="image/*" onchange="handleGallerySelect(event)">
+                </div>
+
+                <!-- Form -->
+                <div class="form-group">
+                    <label class="form-label">Nama Produk</label>
+                    <input type="text" class="form-input" id="product-name" placeholder="Contoh: Indomie Goreng">
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Harga (Rp)</label>
+                    <div class="price-wrapper">
+                        <span class="price-prefix">Rp</span>
+                        <input type="text" class="form-input" id="product-price" placeholder="12.000" inputmode="numeric" pattern="[0-9.]*" onkeyup="formatPrice(this)" onblur="formatPrice(this)">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Berat Produk (per satuan)</label>
+                    <div class="weight-row">
+                        <input type="number" class="form-input weight-input" id="product-weight" placeholder="0" inputmode="numeric" pattern="[0-9.]*">
+                        <button type="button" class="weight-unit active" id="unit-kg" onclick="setWeightUnit('kg')">Kg</button>
+                        <button type="button" class="weight-unit" id="unit-gram" onclick="setWeightUnit('gram')">Gram</button>
+                    </div>
+                    <small style="color: var(--text-muted); font-size: 11px; margin-top: 4px; display: block;">Berat per unit (contoh: 1 kg gula, 500 gram kopi)</small>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label">Deskripsi (Opsional)</label>
+                    <input type="text" class="form-input" id="product-desc" placeholder="Catatan tambahan...">
+                </div>
+
+                <button class="btn btn-primary" onclick="addProduct()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Tambah Produk
+                </button>
+            </div>
+        </div>
+
+        <!-- Halaman 2: Produk -->
+        <div class="page" id="page-products">
+            <h2 class="section-title">Daftar Produk</h2>
+            
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" class="form-input search-input" id="product-search" placeholder="Cari produk..." onkeyup="searchProducts()">
+            </div>
+
+            <div id="product-list" class="product-grid">
+                <!-- Products will be rendered here -->
+            </div>
+            <div class="empty-state" id="empty-products" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                    <line x1="7" y1="7" x2="7.01" y2="7"/>
+                </svg>
+                <h3>Belum ada produk</h3>
+                <p>Tambahkan produk di halaman Input</p>
+            </div>
+        </div>
+
+        <!-- Halaman 3: Kasir -->
+        <div class="page" id="page-kasir">
+            <h2 class="section-title">Keranjang Belanja</h2>
+            <div id="cart-items">
+                <!-- Cart items will be rendered here -->
+            </div>
+            <div class="empty-state" id="empty-cart" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="9" cy="21" r="1"/>
+                    <circle cx="20" cy="21" r="1"/>
+                    <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                </svg>
+                <h3>Keranjang kosong</h3>
+                <p>Tambahkan produk dari halaman Produk</p>
+            </div>
+            
+            <div id="cart-summary" style="display: none;">
+                <div class="summary-section">
+                    <div class="summary-row">
+                        <span class="summary-label">Total Item</span>
+                        <span class="summary-value" id="total-items">0</span>
+                    </div>
+                    <div class="summary-row">
+                        <span class="summary-label">Total Harga</span>
+                        <span class="summary-value summary-total" id="total-price">Rp 0</span>
+                    </div>
+                </div>
+                
+                <div class="payment-section">
+                    <div class="form-group">
+                        <label class="form-label">Uang Diterima (Rp)</label>
+                        <div class="price-wrapper">
+                            <span class="price-prefix">Rp</span>
+                            <input type="text" class="form-input payment-input" id="payment-amount" placeholder="0" inputmode="numeric" pattern="[0-9.]*" onkeyup="formatPrice(this); calculateChange();" onblur="formatPrice(this); calculateChange();">
+                        </div>
+                    </div>
+                    
+                    <div class="change-display" id="change-display">
+                        Kembalian: Rp 0
+                    </div>
+                    
+                    <button class="btn btn-success" style="margin-top: 16px;" onclick="checkout()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                            <polyline points="22,4 12,14.01 9,11.01"/>
+                        </svg>
+                        Bayar & Selesai
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Halaman 4: Hutang -->
+        <div class="page" id="page-debt">
+            <h2 class="section-title">Manajemen Hutang</h2>
+            
+            <div class="debt-form">
+                <div class="form-group">
+                    <label class="form-label">Nama Penghutang</label>
+                    <input type="text" class="form-input" id="debt-name" placeholder="Contoh: Budi">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Deskripsi</label>
+                    <input type="text" class="form-input" id="debt-desc" placeholder="Contoh: Beli 3 pcs Indomie">
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label">Nominal (Rp)</label>
+                    <div class="price-wrapper">
+                        <span class="price-prefix">Rp</span>
+                        <input type="text" class="form-input" id="debt-amount" placeholder="25.000" inputmode="numeric" pattern="[0-9.]*" onkeyup="formatPrice(this)" onblur="formatPrice(this)">
+                    </div>
+                </div>
+                
+                <button class="btn btn-primary" onclick="addDebt()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 5v14M5 12h14"/>
+                    </svg>
+                    Tambah Hutang
+                </button>
+            </div>
+
+            <div class="search-container">
+                <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"/>
+                    <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+                </svg>
+                <input type="text" class="form-input search-input" id="debt-search" placeholder="Cari nama penghutang..." onkeyup="searchDebts()">
+            </div>
+
+            <div class="debt-total" id="debt-total" style="display: none;">
+                <span>Total Hutang</span>
+                <span id="debt-total-amount">Rp 0</span>
+            </div>
+
+            <div class="debt-list" id="debt-list">
+                <!-- Debts will be rendered here -->
+            </div>
+            <div class="empty-state" id="empty-debt" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="12" y1="1" x2="12" y2="23"/>
+                    <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                </svg>
+                <h3>Belum ada hutang</h3>
+                <p>Catat hutang pelanggan di sini</p>
+            </div>
+        </div>
+
+        <!-- Halaman 5: Transaksi -->
+        <div class="page" id="page-transactions">
+            <h2 class="section-title">Riwayat Transaksi</h2>
+            <div id="transaction-list">
+                <!-- Transactions will be rendered here -->
+            </div>
+            <div class="empty-state" id="empty-transactions" style="display: none;">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                    <polyline points="14,2 14,8 20,8"/>
+                    <line x1="16" y1="13" x2="8" y2="13"/>
+                    <line x1="16" y1="17" x2="8" y2="17"/>
+                    <polyline points="10,9 9,9 8,9"/>
+                </svg>
+                <h3>Belum ada transaksi</h3>
+                <p>Transaksi akan muncul di sini</p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bottom Navigation -->
+    <nav class="bottom-nav">
+        <div class="nav-item active" data-page="input" onclick="navigateTo(this, 'input')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M12 5v14M5 12h14"/>
+            </svg>
+            <span>Input</span>
+        </div>
+        <div class="nav-item" data-page="products" onclick="navigateTo(this, 'products')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                <line x1="7" y1="7" x2="7.01" y2="7"/>
+            </svg>
+            <span>Produk</span>
+        </div>
+        <div class="nav-item" data-page="kasir" onclick="navigateTo(this, 'kasir')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="9" cy="21" r="1"/>
+                <circle cx="20" cy="21" r="1"/>
+                <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+            </svg>
+            <span>Kasir</span>
+            <span class="badge" id="cart-badge" style="display: none;">0</span>
+        </div>
+        <div class="nav-item" data-page="debt" onclick="navigateTo(this, 'debt')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <line x1="12" y1="1" x2="12" y2="23"/>
+                <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
+            <span>Hutang</span>
+        </div>
+        <div class="nav-item" data-page="transactions" onclick="navigateTo(this, 'transactions')">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+                <polyline points="14,2 14,8 20,8"/>
+            </svg>
+            <span>Transaksi</span>
+        </div>
+    </nav>
+
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+
+    <!-- Share Modal -->
+    <div class="modal-overlay" id="share-modal">
+        <div class="modal">
+            <h3 class="modal-title">Bagikan Data</h3>
+            <p class="modal-content">Pilih data yang ingin dibagikan:</p>
+            <div class="modal-actions" style="flex-direction: column; gap: 12px;">
+                <button class="btn btn-primary" onclick="shareProducts()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/>
+                    </svg>
+                    Bagikan Daftar Produk
+                </button>
+                <button class="btn btn-outline" onclick="shareDebts()">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px;">
+                        <line x1="12" y1="1" x2="12" y2="23"/>
+                        <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                    Bagikan Daftar Hutang
+                </button>
+                <button class="btn btn-danger" onclick="closeShareModal()" style="margin-top: 8px;">
+                    Batal
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal-overlay" id="delete-modal">
+        <div class="modal">
+            <h3 class="modal-title">Konfirmasi Hapus</h3>
+            <p class="modal-content">Apakah Anda yakin ingin menghapus item ini?</p>
+            <div class="modal-actions">
+                <button class="btn btn-outline" onclick="closeDeleteModal()">Batal</button>
+                <button class="btn btn-danger" id="confirm-delete-btn">Hapus</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Weight Input Modal -->
+    <div class="modal-overlay" id="weight-modal">
+        <div class="modal">
+            <h3 class="modal-title">Masukkan Berat</h3>
+            <div class="weight-modal-product">
+                <div class="weight-modal-name" id="weight-modal-product-name">Nama Produk</div>
+                <div class="weight-modal-info">
+                    <span>Harga per <span id="weight-modal-unit">kg</span>: Rp <span id="weight-modal-price">0</span></span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Berat yang dibeli (<span id="weight-modal-input-unit">kg</span>)</label>
+                <div class="weight-input-section">
+                    <input type="number" class="form-input" id="weight-modal-input" placeholder="0" inputmode="decimal" pattern="[0-9.]*" step="0.01">
+                    <span class="weight-unit active" id="weight-modal-unit-btn">kg</span>
+                </div>
+            </div>
+            <div class="weight-preview">
+                <div class="weight-preview-text">Total Harga</div>
+                <div class="weight-preview-price" id="weight-preview-price">Rp 0</div>
+            </div>
+            <div class="modal-actions" style="margin-top: 20px;">
+                <button class="btn btn-outline" onclick="closeWeightModal()">Batal</button>
+                <button class="btn btn-primary" id="confirm-weight-btn">Tambah</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Data Storage
+        let products = JSON.parse(localStorage.getItem('warung_products')) || [];
+        let cart = JSON.parse(localStorage.getItem('warung_cart')) || [];
+        let debts = JSON.parse(localStorage.getItem('warung_debts')) || [];
+        let transactions = JSON.parse(localStorage.getItem('warung_transactions')) || [];
+        
+        let currentWeightUnit = 'kg';
+        let deleteTarget = null;
+        let deleteType = null;
+        
+        // Camera variables
+        let videoStream = null;
+        let currentCamera = 'environment';
+        let capturedImage = null;
+        let weightModalProduct = null;
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            updateCartBadge();
+            renderProducts();
+            renderCart();
+            renderDebts();
+            renderTransactions();
+        });
+
+        // Navigation
+        function navigateTo(element, page) {
+            // Remove active class from all nav items with smooth transition
+            document.querySelectorAll('.nav-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Add active class to clicked item
+            element.classList.add('active');
+
+            // Update pages with animation
+            document.querySelectorAll('.page').forEach(p => {
+                p.classList.remove('active');
+            });
+            
+            const targetPage = document.getElementById('page-' + page);
+            if (targetPage) {
+                targetPage.classList.add('active');
+            }
+
+            // Refresh data based on page
+            if (page === 'products') renderProducts();
+            if (page === 'kasir') renderCart();
+            if (page === 'debt') renderDebts();
+            if (page === 'transactions') renderTransactions();
+        }
+
+        // Camera Functions
+        async function startCamera() {
+            const video = document.getElementById('camera-video');
+            const placeholder = document.getElementById('camera-placeholder');
+            const controls = document.getElementById('camera-controls');
+            const actions = document.getElementById('camera-actions');
+
+            try {
+                videoStream = await navigator.mediaDevices.getUserMedia({
+                    video: { 
+                        facingMode: currentCamera,
+                        width: { ideal: 640 },
+                        height: { ideal: 480 }
+                    },
+                    audio: false
+                });
+
+                video.srcObject = videoStream;
+                video.style.display = 'block';
+                placeholder.style.display = 'none';
+                controls.classList.add('active');
+                actions.style.display = 'flex';
+                
+                // Show switch camera button if available
+                const switchBtn = document.getElementById('switch-camera-btn');
+                if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+                    switchBtn.style.display = 'flex';
+                }
+            } catch (err) {
+                console.error('Camera error:', err);
+                showToast('Tidak dapat mengakses kamera');
+                openGallery();
+            }
+        }
+
+        function switchCamera() {
+            currentCamera = currentCamera === 'environment' ? 'user' : 'environment';
+            
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            
+            startCamera();
+        }
+
+        function capturePhoto() {
+            const video = document.getElementById('camera-video');
+            const preview = document.getElementById('camera-preview');
+            const placeholder = document.getElementById('camera-placeholder');
+            const controls = document.getElementById('camera-controls');
+
+            // Create canvas and draw video frame
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth || 640;
+            canvas.height = video.videoHeight || 480;
+            
+            ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            // Compress and save
+            capturedImage = canvas.toDataURL('image/jpeg', 0.7);
+            
+            // Stop camera
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+            
+            // Show preview
+            video.style.display = 'none';
+            preview.src = capturedImage;
+            preview.style.display = 'block';
+            controls.classList.remove('active');
+            
+            showToast('Foto berhasil diambil');
+        }
+
+        function openGallery() {
+            document.getElementById('gallery-input').click();
+        }
+
+        function handleGallerySelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    // Stop camera if active
+                    if (videoStream) {
+                        videoStream.getTracks().forEach(track => track.stop());
+                    }
+                    
+                    // Resize and save
+                    const img = new Image();
+                    img.onload = function() {
+                        const canvas = document.createElement('canvas');
+                        const ctx = canvas.getContext('2d');
+                        const maxSize = 300;
+                        
+                        let width = img.width;
+                        let height = img.height;
+                        
+                        if (width > height) {
+                            if (width > maxSize) {
+                                height *= maxSize / width;
+                                width = maxSize;
+                            }
+                        } else {
+                            if (height > maxSize) {
+                                width *= maxSize / height;
+                                height = maxSize;
+                            }
+                        }
+                        
+                        canvas.width = width;
+                        canvas.height = height;
+                        ctx.drawImage(img, 0, 0, width, height);
+                        
+                        capturedImage = canvas.toDataURL('image/jpeg', 0.7);
+                        
+                        // Show preview
+                        const video = document.getElementById('camera-video');
+                        const preview = document.getElementById('camera-preview');
+                        const placeholder = document.getElementById('camera-placeholder');
+                        const controls = document.getElementById('camera-controls');
+                        const actions = document.getElementById('camera-actions');
+                        
+                        video.style.display = 'none';
+                        preview.src = capturedImage;
+                        preview.style.display = 'block';
+                        controls.classList.remove('active');
+                        actions.style.display = 'flex';
+                        
+                        showToast('Foto dipilih');
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Weight Unit Toggle
+        function setWeightUnit(unit) {
+            currentWeightUnit = unit;
+            document.getElementById('unit-kg').classList.toggle('active', unit === 'kg');
+            document.getElementById('unit-gram').classList.toggle('active', unit === 'gram');
+        }
+
+        // Format Price
+        function formatPrice(input) {
+            let value = input.value.replace(/\D/g, '');
+            value = value.replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+            input.value = value;
+        }
+
+        // Parse Price
+        function parsePrice(value) {
+            return parseInt(value.replace(/\D/g, '')) || 0;
+        }
+
+        // Add Product
+        function addProduct() {
+            const name = document.getElementById('product-name').value.trim();
+            const price = parsePrice(document.getElementById('product-price').value);
+            const weight = parseFloat(document.getElementById('product-weight').value) || 0;
+            const desc = document.getElementById('product-desc').value.trim();
+            const image = capturedImage;
+
+            if (!name) {
+                showToast('Nama produk wajib diisi');
+                return;
+            }
+            if (price <= 0) {
+                showToast('Harga produk wajib diisi');
+                return;
+            }
+
+            const product = {
+                id: Date.now(),
+                name: name,
+                price: price,
+                weight: weight,
+                unit: currentWeightUnit,
+                desc: desc,
+                image: image || null,
+                createdAt: new Date().toISOString()
+            };
+
+            products.push(product);
+            localStorage.setItem('warung_products', JSON.stringify(products));
+
+            // Reset form
+            document.getElementById('product-name').value = '';
+            document.getElementById('product-price').value = '';
+            document.getElementById('product-weight').value = '';
+            document.getElementById('product-desc').value = '';
+            document.getElementById('camera-preview').src = '';
+            document.getElementById('camera-preview').style.display = 'none';
+            document.getElementById('camera-placeholder').style.display = 'flex';
+            document.getElementById('camera-actions').style.display = 'none';
+            capturedImage = null;
+
+            showToast('Produk berhasil ditambahkan');
+            
+            // Navigate to products page
+            setTimeout(() => {
+                document.querySelectorAll('.nav-item')[1].click();
+            }, 1000);
+        }
+
+        // Search Products
+        function searchProducts() {
+            renderProducts();
+        }
+
+        // Render Products
+        function renderProducts() {
+            const container = document.getElementById('product-list');
+            const emptyState = document.getElementById('empty-products');
+            const searchTerm = document.getElementById('product-search').value.toLowerCase();
+
+            let filteredProducts = products;
+            if (searchTerm) {
+                filteredProducts = products.filter(p => p.name.toLowerCase().includes(searchTerm));
+            }
+
+            if (filteredProducts.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'flex';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = filteredProducts.map(product => `
+                <div class="product-card">
+                    <img class="product-image" src="${product.image || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%22100%22 height=%22100%22><rect fill=%22%23E5E7EB%22 width=%22100%22 height=%22100%22/><text x=%2250%25%22 y=%2250%25%22 dominant-baseline=%22middle%22 text-anchor=%22middle%22 fill=%22%239CA3AF%22 font-size=%2212%22>No Image</text></svg>'}" alt="${product.name}">
+                    <div class="product-info">
+                        <div class="product-name">${product.name}</div>
+                        <div class="product-price">Rp ${formatNumber(product.price)}</div>
+                        <div class="product-weight">Berat: ${product.weight > 0 ? product.weight + ' ' + product.unit : 'Tidak punya berat'}${product.desc ? ' • ' + product.desc : ''}</div>
+                        <div class="product-actions">
+                            ${product.weight > 0 ? `
+                                <button class="product-btn product-btn-cart" onclick="openWeightModal(${product.id})">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="9" cy="21" r="1"/>
+                                        <circle cx="20" cy="21" r="1"/>
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                    </svg>
+                                    Tambah
+                                </button>
+                            ` : `
+                                <button class="product-btn product-btn-cart" onclick="addToCart(${product.id})">
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <circle cx="9" cy="21" r="1"/>
+                                        <circle cx="20" cy="21" r="1"/>
+                                        <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6"/>
+                                    </svg>
+                                    Keranjang
+                                </button>
+                            `}
+                            <button class="product-btn product-btn-delete" onclick="confirmDelete(${product.id}, 'product')">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3,6 5,6 21,6"/>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Weight Modal Functions
+        function openWeightModal(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            weightModalProduct = product;
+            
+            document.getElementById('weight-modal-product-name').textContent = product.name;
+            document.getElementById('weight-modal-unit').textContent = product.unit;
+            document.getElementById('weight-modal-price').textContent = formatNumber(product.price);
+            document.getElementById('weight-modal-input-unit').textContent = product.unit;
+            document.getElementById('weight-modal-unit-btn').textContent = product.unit;
+            document.getElementById('weight-modal-input').value = '';
+            document.getElementById('weight-preview-price').textContent = 'Rp 0';
+            
+            document.getElementById('confirm-weight-btn').onclick = () => addWeightedProduct(product);
+            
+            document.getElementById('weight-modal').classList.add('show');
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('weight-modal-input').focus();
+            }, 100);
+        }
+
+        function closeWeightModal() {
+            document.getElementById('weight-modal').classList.remove('show');
+            weightModalProduct = null;
+        }
+
+        function addWeightedProduct(product) {
+            const input = document.getElementById('weight-modal-input');
+            const purchaseWeight = parseFloat(input.value) || 0;
+
+            if (purchaseWeight <= 0) {
+                showToast('Masukkan berat yang dibeli');
+                return;
+            }
+
+            // Calculate price
+            // If product.weight is 1 kg and costs 10000, and user buys 0.5 kg
+            // price = (0.5 / 1) * 10000 = 5000
+            let purchasePrice = 0;
+            let displayWeight = purchaseWeight;
+            
+            if (product.unit === 'kg') {
+                purchasePrice = (purchaseWeight / product.weight) * product.price;
+                displayWeight = purchaseWeight;
+            } else {
+                // Convert to kg for display if unit is gram
+                purchasePrice = (purchaseWeight / product.weight) * product.price;
+                displayWeight = purchaseWeight;
+            }
+
+            purchasePrice = Math.round(purchasePrice);
+
+            // Add to cart
+            const existingItem = cart.find(item => item.id === product.id && item.isWeighted);
+            if (existingItem) {
+                // For weighted items, we add as new item instead of combining
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: purchasePrice,
+                    image: product.image,
+                    qty: 1,
+                    isWeighted: true,
+                    weight: purchaseWeight,
+                    weightUnit: product.unit,
+                    pricePerUnit: product.price,
+                    unitWeight: product.weight
+                });
+            } else {
+                cart.push({
+                    id: product.id,
+                    name: product.name,
+                    price: purchasePrice,
+                    image: product.image,
+                    qty: 1,
+                    isWeighted: true,
+                    weight: purchaseWeight,
+                    weightUnit: product.unit,
+                    pricePerUnit: product.price,
+                    unitWeight: product.weight
+                });
+            }
+
+            localStorage.setItem('warung_cart', JSON.stringify(cart));
+            updateCartBadge();
+            closeWeightModal();
+            showToast('Ditambahkan ke keranjang');
+        }
+
+        // Update weight preview when typing
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('weight-modal-input').addEventListener('input', function() {
+                if (!weightModalProduct) return;
+                
+                const purchaseWeight = parseFloat(this.value) || 0;
+                let price = 0;
+                
+                if (purchaseWeight > 0 && weightModalProduct.weight > 0) {
+                    price = (purchaseWeight / weightModalProduct.weight) * weightModalProduct.price;
+                }
+                
+                document.getElementById('weight-preview-price').textContent = 'Rp ' + formatNumber(Math.round(price));
+            });
+        });
+
+        // Add to Cart (for non-weighted items)
+        function addToCart(productId) {
+            const product = products.find(p => p.id === productId);
+            if (!product) return;
+
+            const existingItem = cart.find(item => item.id === productId && !item.isWeighted);
+            if (existingItem) {
+                existingItem.qty += 1;
+            } else {
+                cart.push({
+                    id: productId,
+                    name: product.name,
+                    price: product.price,
+                    image: product.image,
+                    qty: 1,
+                    isWeighted: false
+                });
+            }
+
+            localStorage.setItem('warung_cart', JSON.stringify(cart));
+            updateCartBadge();
+            showToast('Ditambahkan ke keranjang');
+        }
+
+        // Update Cart Badge
+        function updateCartBadge() {
+            const badge = document.getElementById('cart-badge');
+            const totalQty = cart.reduce((sum, item) => sum + item.qty, 0);
+            
+            if (totalQty > 0) {
+                badge.textContent = totalQty > 9 ? '9+' : totalQty;
+                badge.style.display = 'flex';
+            } else {
+                badge.style.display = 'none';
+            }
+        }
+
+        // Render Cart
+        function renderCart() {
+            const container = document.getElementById('cart-items');
+            const emptyState = document.getElementById('empty-cart');
+            const summary = document.getElementById('cart-summary');
+
+            if (cart.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'flex';
+                summary.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            summary.style.display = 'block';
+
+            let totalItems = 0;
+            let totalPrice = 0;
+
+            container.innerHTML = cart.map(item => {
+                totalItems += item.qty;
+                totalPrice += item.price;
+
+                let weightText = '';
+                if (item.isWeighted) {
+                    weightText = `<div class="cart-item-weight">${item.weight} ${item.weightUnit} × Rp ${formatNumber(item.pricePerUnit)}/${item.unitWeight === 1 ? item.weightUnit : item.unitWeight}</div>`;
+                }
+
+                return `
+                    <div class="cart-item">
+                        <img class="cart-item-image" src="${item.image || 'data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2260%22 height=%2260%22><rect fill=%22%23E5E7EB%22 width=%2260%22 height=%2260%22/></svg>'}" alt="${item.name}">
+                        <div class="cart-item-details">
+                            <div class="cart-item-name">${item.name}</div>
+                            <div class="cart-item-price">${item.isWeighted ? 'Rp ' + formatNumber(item.price) : 'Rp ' + formatNumber(item.price) + ' × ' + item.qty}</div>
+                            ${weightText}
+                        </div>
+                        <div class="cart-item-actions">
+                            ${!item.isWeighted ? `
+                                <button class="qty-btn" onclick="updateCartQty(${item.id}, -1)">-</button>
+                                <span style="font-weight: 600; min-width: 24px; text-align: center;">${item.qty}</span>
+                                <button class="qty-btn" onclick="updateCartQty(${item.id}, 1)">+</button>
+                            ` : ''}
+                            <button class="remove-item-btn" onclick="removeFromCartByIndex(${cart.indexOf(item)})">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"/>
+                                    <line x1="6" y1="6" x2="18" y2="18"/>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+
+            document.getElementById('total-items').textContent = totalItems + ' item';
+            document.getElementById('total-price').textContent = 'Rp ' + formatNumber(totalPrice);
+        }
+
+        // Update Cart Quantity
+        function updateCartQty(productId, change) {
+            const item = cart.find(i => i.id === productId && !i.isWeighted);
+            if (item) {
+                item.qty += change;
+                if (item.qty <= 0) {
+                    cart = cart.filter(i => i.id !== productId || i.isWeighted);
+                }
+                localStorage.setItem('warung_cart', JSON.stringify(cart));
+                updateCartBadge();
+                renderCart();
+            }
+        }
+
+        // Remove from Cart
+        function removeFromCartByIndex(index) {
+            if (index >= 0 && index < cart.length) {
+                cart.splice(index, 1);
+                localStorage.setItem('warung_cart', JSON.stringify(cart));
+                updateCartBadge();
+                renderCart();
+                showToast('Item dihapus dari keranjang');
+            }
+        }
+
+        // Calculate Change
+        function calculateChange() {
+            const payment = parsePrice(document.getElementById('payment-amount').value);
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+            const change = payment - total;
+
+            const changeDisplay = document.getElementById('change-display');
+            if (payment > 0) {
+                if (change >= 0) {
+                    changeDisplay.className = 'change-display change-positive';
+                    changeDisplay.innerHTML = `Kembalian: <strong>Rp ${formatNumber(change)}</strong>`;
+                } else {
+                    changeDisplay.className = 'change-display change-negative';
+                    changeDisplay.innerHTML = `Kurang: <strong>Rp ${formatNumber(Math.abs(change))}</strong>`;
+                }
+            } else {
+                changeDisplay.className = 'change-display';
+                changeDisplay.textContent = 'Kembalian: Rp 0';
+            }
+        }
+
+        // Checkout
+        function checkout() {
+            if (cart.length === 0) {
+                showToast('Keranjang kosong');
+                return;
+            }
+
+            const payment = parsePrice(document.getElementById('payment-amount').value);
+            const total = cart.reduce((sum, item) => sum + item.price, 0);
+
+            if (payment < total && payment > 0) {
+                showToast('Uang tidak cukup');
+                return;
+            }
+
+            const transaction = {
+                id: Date.now(),
+                date: new Date().toISOString(),
+                items: cart.map(item => ({
+                    name: item.name,
+                    qty: item.qty,
+                    price: item.price,
+                    subtotal: item.price,
+                    isWeighted: item.isWeighted || false,
+                    weight: item.weight || 0,
+                    weightUnit: item.weightUnit || ''
+                })),
+                total: total,
+                payment: payment,
+                change: payment - total
+            };
+
+            transactions.unshift(transaction);
+            localStorage.setItem('warung_transactions', JSON.stringify(transactions));
+
+            // Clear cart
+            cart = [];
+            localStorage.setItem('warung_cart', JSON.stringify(cart));
+            updateCartBadge();
+
+            // Reset payment
+            document.getElementById('payment-amount').value = '';
+            document.getElementById('change-display').className = 'change-display';
+            document.getElementById('change-display').textContent = 'Kembalian: Rp 0';
+
+            showToast('Transaksi berhasil!');
+            
+            // Navigate to transactions page
+            setTimeout(() => {
+                document.querySelectorAll('.nav-item')[4].click();
+            }, 1000);
+        }
+
+        // Add Debt
+        function addDebt() {
+            const name = document.getElementById('debt-name').value.trim();
+            const desc = document.getElementById('debt-desc').value.trim();
+            const amount = parsePrice(document.getElementById('debt-amount').value);
+
+            if (!name) {
+                showToast('Nama penghutang wajib diisi');
+                return;
+            }
+            if (amount <= 0) {
+                showToast('Nominal hutang wajib diisi');
+                return;
+            }
+
+            const debt = {
+                id: Date.now(),
+                name: name,
+                desc: desc,
+                amount: amount,
+                date: new Date().toISOString()
+            };
+
+            debts.push(debt);
+            localStorage.setItem('warung_debts', JSON.stringify(debts));
+
+            // Reset form
+            document.getElementById('debt-name').value = '';
+            document.getElementById('debt-desc').value = '';
+            document.getElementById('debt-amount').value = '';
+
+            showToast('Hutang berhasil ditambahkan');
+            renderDebts();
+        }
+
+        // Search Debts
+        function searchDebts() {
+            renderDebts();
+        }
+
+        // Render Debts
+        function renderDebts() {
+            const searchTerm = document.getElementById('debt-search').value.toLowerCase();
+            const container = document.getElementById('debt-list');
+            const emptyState = document.getElementById('empty-debt');
+            const totalSection = document.getElementById('debt-total');
+
+            let filteredDebts = debts;
+            if (searchTerm) {
+                filteredDebts = debts.filter(d => d.name.toLowerCase().includes(searchTerm));
+            }
+
+            // Calculate total by person
+            const totalsByPerson = {};
+            filteredDebts.forEach(d => {
+                if (!totalsByPerson[d.name]) {
+                    totalsByPerson[d.name] = 0;
+                }
+                totalsByPerson[d.name] += d.amount;
+            });
+
+            if (filteredDebts.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'flex';
+                totalSection.style.display = 'none';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+
+            // Show total if searching
+            if (searchTerm && Object.keys(totalsByPerson).length > 0) {
+                const searchName = Object.keys(totalsByPerson)[0];
+                totalSection.style.display = 'flex';
+                document.getElementById('debt-total-amount').textContent = 'Rp ' + formatNumber(totalsByPerson[searchName]);
+            } else {
+                totalSection.style.display = 'none';
+            }
+
+            container.innerHTML = filteredDebts.map(debt => `
+                <div class="debt-item">
+                    <div class="debt-info">
+                        <div class="debt-name">${debt.name}</div>
+                        <div class="debt-desc">${debt.desc || 'Tanpa deskripsi'}</div>
+                        <div class="debt-date">${formatDate(debt.date)}</div>
+                    </div>
+                    <div class="debt-amount">Rp ${formatNumber(debt.amount)}</div>
+                    <div class="debt-actions">
+                        <button class="debt-action-btn debt-share-btn" onclick="shareDebt(${debt.id})">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/>
+                                <polyline points="16,6 12,2 8,6"/>
+                                <line x1="12" y1="2" x2="12" y2="15"/>
+                            </svg>
+                        </button>
+                        <button class="debt-action-btn debt-delete-btn" onclick="confirmDelete(${debt.id}, 'debt')">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polyline points="3,6 5,6 21,6"/>
+                                <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Render Transactions
+        function renderTransactions() {
+            const container = document.getElementById('transaction-list');
+            const emptyState = document.getElementById('empty-transactions');
+
+            if (transactions.length === 0) {
+                container.innerHTML = '';
+                emptyState.style.display = 'flex';
+                return;
+            }
+
+            emptyState.style.display = 'none';
+            container.innerHTML = transactions.map(tx => `
+                <div class="transaction-item">
+                    <div class="transaction-header">
+                        <span class="transaction-date">${formatDateTime(tx.date)}</span>
+                        <span class="transaction-total">Rp ${formatNumber(tx.total)}</span>
+                    </div>
+                    <div class="transaction-items">
+                        ${tx.items.map(item => `
+                            <div class="transaction-product">
+                                <span>${item.name} ${item.isWeighted ? '(' + item.weight + ' ' + item.weightUnit + ')' : '× ' + item.qty}</span>
+                                <span>Rp ${formatNumber(item.subtotal)}</span>
+                            </div>
+                        `).join('')}
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // Share Functions
+        function showShareOptions() {
+            document.getElementById('share-modal').classList.add('show');
+        }
+
+        function closeShareModal() {
+            document.getElementById('share-modal').classList.remove('show');
+        }
+
+        function shareProducts() {
+            if (products.length === 0) {
+                showToast('Belum ada produk untuk dibagikan');
+                return;
+            }
+
+            let text = '📋 DAFTAR PRODUK WARUNG KITA\n\n';
+            products.forEach((p, i) => {
+                text += `${i + 1}. ${p.name}\n`;
+                text += `   Rp ${formatNumber(p.price)}\n`;
+                if (p.weight) text += `   Berat: ${p.weight} ${p.unit}\n`;
+                text += '\n';
+            });
+
+            shareText(text);
+            closeShareModal();
+        }
+
+        function shareDebts() {
+            if (debts.length === 0) {
+                showToast('Belum ada hutang untuk dibagikan');
+                return;
+            }
+
+            // Group by name
+            const grouped = {};
+            debts.forEach(d => {
+                if (!grouped[d.name]) grouped[d.name] = 0;
+                grouped[d.name] += d.amount;
+            });
+
+            let text = '📋 LAPORAN HUTANG WARUNG KITA\n\n';
+            Object.entries(grouped).forEach(([name, total]) => {
+                text += `${name}: Rp ${formatNumber(total)}\n`;
+            });
+            text += `\nTotal: Rp ${formatNumber(debts.reduce((s, d) => s + d.amount, 0))}`;
+
+            shareText(text);
+            closeShareModal();
+        }
+
+        function shareDebt(id) {
+            const debt = debts.find(d => d.id === id);
+            if (!debt) return;
+
+            const text = `Halo ${debt.name}, reminder bahwa Anda memiliki hutang sebesar Rp ${formatNumber(debt.amount)} untuk ${debt.desc || 'pembelian di Warung Kita'}. Mohon segera dilunasi. Terima kasih.`;
+            shareText(text);
+        }
+
+        function shareText(text) {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'Warung Kita',
+                    text: text
+                }).catch(() => {
+                    copyToClipboard(text);
+                });
+            } else {
+                copyToClipboard(text);
+            }
+        }
+
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                showToast('Teks disalin ke clipboard');
+            }).catch(() => {
+                showToast('Gagal menyalin teks');
+            });
+        }
+
+        // Delete Functions
+        function confirmDelete(id, type) {
+            deleteTarget = id;
+            deleteType = type;
+            document.getElementById('confirm-delete-btn').onclick = () => {
+                if (deleteType === 'product') {
+                    products = products.filter(p => p.id !== deleteTarget);
+                    localStorage.setItem('warung_products', JSON.stringify(products));
+                    renderProducts();
+                    showToast('Produk dihapus');
+                } else if (deleteType === 'debt') {
+                    debts = debts.filter(d => d.id !== deleteTarget);
+                    localStorage.setItem('warung_debts', JSON.stringify(debts));
+                    renderDebts();
+                    showToast('Hutang dihapus');
+                }
+                closeDeleteModal();
+            };
+            document.getElementById('delete-modal').classList.add('show');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').classList.remove('show');
+            deleteTarget = null;
+            deleteType = null;
+        }
+
+        // Utility Functions
+        function formatNumber(num) {
+            return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
+        }
+
+        function formatDate(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric'
+            });
+        }
+
+        function formatDateTime(dateStr) {
+            const date = new Date(dateStr);
+            return date.toLocaleDateString('id-ID', {
+                day: 'numeric',
+                month: 'short',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 2500);
+        }
+
+        // Close modals when clicking outside
+        document.getElementById('share-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeShareModal();
+        });
+
+        document.getElementById('delete-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeDeleteModal();
+        });
+
+        document.getElementById('weight-modal').addEventListener('click', function(e) {
+            if (e.target === this) closeWeightModal();
+        });
+
+        // Stop camera when page unloads
+        window.addEventListener('beforeunload', function() {
+            if (videoStream) {
+                videoStream.getTracks().forEach(track => track.stop());
+            }
+        });
+    </script>
+    <style>
+        #minimax-floating-ball {
+            position: fixed;
+            bottom: 85px;
+            right: 15px;
+            padding: 8px 10px;
+            background: rgba(34, 34, 34, 0.95);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            color: #F8F8F8;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            z-index: 999;
+            transition: all 0.3s ease;
+            overflow: hidden;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        #minimax-floating-ball:hover {
+            transform: translateY(-2px);
+            background: #383838;
+        }
+
+        .minimax-ball-content {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .minimax-logo-wave {
+            width: 26px;
+            height: 22px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='26' height='22' viewBox='0 0 26 22' fill='none'%3E%3Cg clip-path='url(%23clip0_3442_102412)'%3E%3Cpath d='M12.8405 14.6775C12.8405 14.9897 13.0932 15.2424 13.4055 15.2424C13.7178 15.2424 13.9705 14.9897 13.9705 14.6775V2.98254C13.9705 1.88957 13.0809 1 11.9879 1C10.895 1 10.0054 1.88957 10.0054 2.98254V11.566V17.1068C10.0054 17.5773 9.62327 17.9594 9.1528 17.9594C8.68233 17.9594 8.30021 17.5773 8.30021 17.1068V8.04469C8.30021 6.95172 7.41063 6.06215 6.31767 6.06215C5.22471 6.06215 4.33513 6.95172 4.33513 8.04469V11.8855C4.33513 12.3559 3.953 12.7381 3.48254 12.7381C3.01207 12.7381 2.62994 12.3559 2.62994 11.8855V10.4936C2.62994 10.1813 2.37725 9.92861 2.06497 9.92861C1.7527 9.92861 1.5 10.1813 1.5 10.4936V11.8855C1.5 12.9784 2.38957 13.868 3.48254 13.868C4.5755 13.868 5.46508 12.9784 5.46508 11.8855V8.04469C5.46508 7.57422 5.8472 7.19209 6.31767 7.19209C6.78814 7.19209 7.17026 7.57422 7.17026 8.04469V17.1068C7.17026 18.1998 8.05984 19.0894 9.1528 19.0894C10.2458 19.0894 11.1353 18.1998 11.1353 17.1068V2.98254C11.1353 2.51207 11.5175 2.12994 11.9879 2.12994C12.4584 2.12994 12.8405 2.51207 12.8405 2.98254V14.6775Z' fill='%23F8F8F8'/%3E%3Cpath d='M23.3278 6.06215C22.2348 6.06215 21.3452 6.95172 21.3452 8.04469V15.6143C21.3452 16.0847 20.9631 16.4669 20.4926 16.4669C20.0222 16.4669 19.6401 16.0847 19.6401 15.6143V2.98254C19.6401 1.88957 18.7505 1 17.6575 1C16.5645 1 15.675 1.88957 15.675 2.98254V19.0175C15.675 19.4879 15.2928 19.8701 14.8224 19.8701C14.3519 19.8701 13.9698 19.4879 13.9698 19.0175V17.0329C13.9698 16.7206 13.7171 16.4679 13.4048 16.4679C13.0925 16.4679 12.8398 16.7206 12.8398 17.0329V19.0175C12.8398 20.1104 13.7294 21 14.8224 21C15.9153 21 16.8049 20.1104 16.8049 19.0175V2.98254C16.8049 2.51207 17.187 2.12994 17.6575 2.12994C18.128 2.12994 18.5101 2.51207 18.5101 2.98254V15.6143C18.5101 16.7072 19.3997 17.5968 20.4926 17.5968C21.5856 17.5968 22.4752 16.7072 22.4752 15.6143V8.04469C22.4752 7.57422 22.8573 7.19209 23.3278 7.19209C23.7982 7.19209 24.1804 7.57422 24.1804 8.04469V14.6775C24.1804 14.9897 24.4331 15.2424 24.7453 15.2424C25.0576 15.2424 25.3103 14.9897 25.3103 14.6775V8.04469C25.3103 6.95172 24.4207 6.06215 23.3278 6.06215Z' fill='%23F8F8F8'/%3E%3C/g%3E%3Cdefs%3E%3CclipPath id='clip0_3442_102412'%3E%3Crect width='25' height='22' fill='white' transform='translate(0.5)'/%3E%3C/clipPath%3E%3C/defs%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: center;
+        }
+
+        .minimax-ball-text {
+            font-size: 12px;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .minimax-close-icon {
+            margin-left: 8px;
+            font-size: 16px;
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.2s ease;
+        }
+
+        .minimax-close-icon:hover {
+            opacity: 1;
+        }
+    </style>
+    <div id="minimax-floating-ball">
+        <div class="minimax-ball-content">
+            <div class="minimax-logo-wave"></div>
+            <span class="minimax-ball-text">Created by MiniMax Agent</span>
+        </div>
+        <div class="minimax-close-icon">×</div>
+    </div>
+    <script>
+        // Initialize floating ball functionality
+        function initFloatingBall() {
+            const ball = document.getElementById('minimax-floating-ball');
+            if (!ball) return;
+
+            // Initial animation
+            ball.style.opacity = '0';
+            ball.style.transform = 'translateY(20px)';
+
+            setTimeout(() => {
+                ball.style.opacity = '1';
+                ball.style.transform = 'translateY(0)';
+            }, 500);
+
+            // Handle logo click
+            const ballContent = ball.querySelector('.minimax-ball-content');
+            ballContent.addEventListener('click', function(e) {
+                e.stopPropagation();
+                window.open('https://agent.minimax.io/', '_blank');
+                ball.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    ball.style.transform = 'scale(1)';
+                }, 100);
+            });
+
+            // Handle close button click
+            const closeIcon = ball.querySelector('.minimax-close-icon');
+            closeIcon.addEventListener('click', function(e) {
+                e.stopPropagation();
+                ball.style.opacity = '0';
+                ball.style.transform = 'translateY(20px)';
+
+                setTimeout(() => {
+                    ball.style.display = 'none';
+                }, 300);
+            });
+        }
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', initFloatingBall);
+    </script>
+</body>
+</html>
